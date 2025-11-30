@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
 
-type GroupKey = "gender" | "size" | "color" | "price";
+
+type GroupKey = "brand" | "league" | "team" | "size" | "price";
 
 interface FilterGroupProps {
     title: string;

@@ -5,9 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { getArrayParam, removeParams, toggleArrayParam } from "@/lib/utils/query";
 import FilterGroup from "./FilterGroup";
 
-const GENDERS = ["men", "women"] as const;
-const SIZES = ["XS", "S", "M", "L", "XL"] as const;
-const COLORS = ["black", "white", "red", "green", "blue", "grey"] as const;
+const BRANDS = ["nike", "adidas", "puma"] as const;
+const LEAGUES = ["nba", "euroleague"] as const;
+const TEAMS = ["lakers", "warriors", "barcelona"] as const;
+const SIZES = ["S", "M", "L", "XL"] as const;
 const PRICES = [
   { id: "0-50", label: "$0 - $50" },
   { id: "50-100", label: "$50 - $100" },
@@ -15,7 +16,7 @@ const PRICES = [
   { id: "150-", label: "Over $150" },
 ] as const;
 
-type GroupKey = "gender" | "size" | "color" | "price";
+type GroupKey = "brand" | "league" | "team" | "size" | "price";
 
 const Filters = () => {
     const router = useRouter();
@@ -25,17 +26,19 @@ const Filters = () => {
 
     const [open, setOpen] = useState(false);
     const [expanded, setExpanded] = useState<Record<GroupKey, boolean>>({
-        gender: true,
+        brand: true,
+        team: true,
+        league: true,
         size: true,
-        color: true,
         price: true,
     });
 
     const activeCounts = {
-        gender: getArrayParam(search, "gender").length,
-        size: getArrayParam(search, "size").length,
-        color: getArrayParam(search, "color").length,
-        price: getArrayParam(search, "price").length,
+      brand: getArrayParam(search, "brand").length,
+      league: getArrayParam(search, "league").length,
+      team: getArrayParam(search, "team").length,
+      size: getArrayParam(search, "size").length,
+      price: getArrayParam(search, "price").length,
     };
 
     useEffect(() => {
@@ -43,7 +46,7 @@ const Filters = () => {
     }, [search]);
 
     const clearAll = () => {
-      const url = removeParams(pathname, search, ["gender", "size", "color", "price", "page"]);
+      const url = removeParams(pathname, search, ["brand", "league", "team", "size", "price","page"]);
       router.push(url, { scroll: false });
     }
 
@@ -74,25 +77,25 @@ const Filters = () => {
           </button>
         </div>
          <FilterGroup
-            title={`Gender ${activeCounts.gender ? `(${activeCounts.gender})` : ""}`}
-            k="gender"
-            expanded={expanded.gender}
+            title={`Brand ${activeCounts.brand ? `(${activeCounts.brand})` : ""}`}
+            k="brand"
+            expanded={expanded.brand}
             setExpanded={setExpanded}
         >
           <ul className="space-y-2">
-            {GENDERS.map((g) => {
-              const checked = getArrayParam(search, "gender").includes(g);
+            {BRANDS.map((b) => {
+              const checked = getArrayParam(search, "brand").includes(b);
               return (
-                <li key={g} className="flex items-center gap-2">
+                <li key={b} className="flex items-center gap-2">
                   <input
-                    id={`gender-${g}`}
+                    id={`brand-${b}`}
                     type="checkbox"
                     className="h-4 w-4 accent-dark-900"
                     checked={checked}
-                    onChange={() => onToggle("gender", g)}
+                    onChange={() => onToggle("brand", b)}
                   />
-                  <label htmlFor={`gender-${g}`} className="text-body text-dark-900">
-                    {g[0].toUpperCase() + g.slice(1)}
+                  <label htmlFor={`brand-${b}`} className="text-body text-dark-900">
+                    {b[0].toUpperCase() + b.slice(1)}
                   </label>
                 </li>
               );
@@ -126,24 +129,49 @@ const Filters = () => {
         </FilterGroup>
 
         <FilterGroup 
-            title={`Color ${activeCounts.color ? `(${activeCounts.color})` : ""}`}
-            k="color"
-            expanded={expanded.color}
+            title={`League ${activeCounts.league ? `(${activeCounts.league})` : ""}`}
+            k="league"
+            expanded={expanded.league}
             setExpanded={setExpanded}>
           <ul className="grid grid-cols-2 gap-2">
-            {COLORS.map((c) => {
-              const checked = getArrayParam(search, "color").includes(c);
+            {LEAGUES.map((l) => {
+              const checked = getArrayParam(search, "league").includes(l);
               return (
-                <li key={c} className="flex items-center gap-2">
+                <li key={l} className="flex items-center gap-2">
                   <input
-                    id={`color-${c}`}
+                    id={`league-${l}`}
                     type="checkbox"
                     className="h-4 w-4 accent-dark-900"
                     checked={checked}
-                    onChange={() => onToggle("color", c)}
+                    onChange={() => onToggle("league", l)}
                   />
-                  <label htmlFor={`color-${c}`} className="text-body capitalize">
-                    {c}
+                  <label htmlFor={`league-${l}`} className="text-body capitalize">
+                    {l}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </FilterGroup>
+        <FilterGroup 
+            title={`Team ${activeCounts.team ? `(${activeCounts.league})` : ""}`}
+            k="team"
+            expanded={expanded.team}
+            setExpanded={setExpanded}>
+          <ul className="grid grid-cols-2 gap-2">
+            {TEAMS.map((t) => {
+              const checked = getArrayParam(search, "team").includes(t);
+              return (
+                <li key={t} className="flex items-center gap-2">
+                  <input
+                    id={`team-${t}`}
+                    type="checkbox"
+                    className="h-4 w-4 accent-dark-900"
+                    checked={checked}
+                    onChange={() => onToggle("team", t)}
+                  />
+                  <label htmlFor={`team-${t}`} className="text-body capitalize">
+                    {t}
                   </label>
                 </li>
               );
@@ -196,38 +224,38 @@ const Filters = () => {
             
             <div className="md:hidden">
              <FilterGroup
-                title={`Gender ${activeCounts.gender ? `(${activeCounts.gender})` : ""}`}
-                k="gender"
-                expanded={expanded.gender}
-                setExpanded={setExpanded}
-            >
-              <ul className="space-y-2">
-                {GENDERS.map((g) => {
-                  const checked = getArrayParam(search, "gender").includes(g);
-                  return (
-                    <li key={g} className="flex items-center gap-2">
-                      <input
-                        id={`gender-${g}`}
-                        type="checkbox"
-                        className="h-4 w-4 accent-dark-900"
-                        checked={checked}
-                        onChange={() => onToggle("gender", g)}
-                      />
-                      <label htmlFor={`gender-${g}`} className="text-body text-dark-900">
-                        {g[0].toUpperCase() + g.slice(1)}
-                      </label>
-                    </li>
-                  );
-                })}
-              </ul>
-            </FilterGroup>
-            <FilterGroup 
+            title={`Brand ${activeCounts.brand ? `(${activeCounts.brand})` : ""}`}
+            k="brand"
+            expanded={expanded.brand}
+            setExpanded={setExpanded}
+        >
+          <ul className="space-y-2">
+            {BRANDS.map((b) => {
+              const checked = getArrayParam(search, "brand").includes(b);
+              return (
+                <li key={b} className="flex items-center gap-2">
+                  <input
+                    id={`brand-${b}`}
+                    type="checkbox"
+                    className="h-4 w-4 accent-dark-900"
+                    checked={checked}
+                    onChange={() => onToggle("brand", b)}
+                  />
+                  <label htmlFor={`brand-${b}`} className="text-body text-dark-900">
+                    {b[0].toUpperCase() + b.slice(1)}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </FilterGroup>
+         <FilterGroup 
             title={`Size ${activeCounts.size ? `(${activeCounts.size})` : ""}`}
             k="size"
             expanded={expanded.size}
             setExpanded={setExpanded}
         >
-          <ul className="grid grid-cols-4 gap-2">
+          <ul className="grid grid-cols-5 gap-2">
             {SIZES.map((s) => {
               const checked = getArrayParam(search, "size").includes(s);
               return (
@@ -248,30 +276,57 @@ const Filters = () => {
         </FilterGroup>
 
         <FilterGroup 
-            title={`Color ${activeCounts.color ? `(${activeCounts.color})` : ""}`}
-            k="color"
-            expanded={expanded.color}
+            title={`League ${activeCounts.league ? `(${activeCounts.league})` : ""}`}
+            k="league"
+            expanded={expanded.league}
             setExpanded={setExpanded}>
           <ul className="grid grid-cols-2 gap-2">
-            {COLORS.map((c) => {
-              const checked = getArrayParam(search, "color").includes(c);
+            {LEAGUES.map((l) => {
+              const checked = getArrayParam(search, "league").includes(l);
               return (
-                <li key={c} className="flex items-center gap-2">
+                <li key={l} className="flex items-center gap-2">
                   <input
-                    id={`color-${c}`}
+                    id={`league-${l}`}
                     type="checkbox"
                     className="h-4 w-4 accent-dark-900"
                     checked={checked}
-                    onChange={() => onToggle("color", c)}
+                    onChange={() => onToggle("league", l)}
                   />
-                  <label htmlFor={`color-${c}`} className="text-body capitalize">
-                    {c}
+                  <label htmlFor={`league-${l}`} className="text-body capitalize">
+                    {l}
                   </label>
                 </li>
               );
             })}
           </ul>
         </FilterGroup>
+        <FilterGroup 
+            title={`Team ${activeCounts.team ? `(${activeCounts.league})` : ""}`}
+            k="team"
+            expanded={expanded.team}
+            setExpanded={setExpanded}>
+          <ul className="grid grid-cols-2 gap-2">
+            {TEAMS.map((t) => {
+              const checked = getArrayParam(search, "team").includes(t);
+              return (
+                <li key={t} className="flex items-center gap-2">
+                  <input
+                    id={`team-${t}`}
+                    type="checkbox"
+                    className="h-4 w-4 accent-dark-900"
+                    checked={checked}
+                    onChange={() => onToggle("team", t)}
+                  />
+                  <label htmlFor={`team-${t}`} className="text-body capitalize">
+                    {t}
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </FilterGroup>
+
+       
 
         <FilterGroup 
           title={`Price ${activeCounts.price ? `(${activeCounts.size})` : ""}`}
