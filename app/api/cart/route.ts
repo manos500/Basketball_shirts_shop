@@ -1,17 +1,24 @@
-import { NextRequest, NextResponse } from "next/server";
-import { addToCart } from "@/lib/actions/cart";
-import { getCart } from "@/lib/actions/cart";
+import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { addToCart, getCart } from "@/lib/actions/cart";
+import { auth } from "@/lib/auth";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { userId, guestId, variantId, quantity } = body;
+    const { variantId, quantity } = body;
 
     if (!variantId || !quantity) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userId = session?.user?.id;
+
+    const guestId = body.guestId;
+
     const cart = await addToCart({ userId, guestId, variantId, quantity });
+
     return NextResponse.json(cart);
   } catch (err) {
     console.error(err);
@@ -19,13 +26,18 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get("userId") ?? undefined;
-    const guestId = url.searchParams.get("guestId") ?? undefined;
+    
+    const session = await auth.api.getSession({ headers: await headers() });
 
-    const cart = await getCart({ userId, guestId });
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+
+    const cart = await getCart(userId);
 
     return NextResponse.json(cart);
   } catch (err) {

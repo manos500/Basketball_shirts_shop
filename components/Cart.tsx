@@ -13,7 +13,7 @@ const Cart = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
-  const { data: cart, isLoading, isError } = useGetCartById(userId);
+  const { data: cart, isLoading, isError } = useGetCartById();
   const { mutate: removeFromCartItem } = useRemoveFromCart();
 
   if (isLoading) return <p>Loading your cart...</p>;
