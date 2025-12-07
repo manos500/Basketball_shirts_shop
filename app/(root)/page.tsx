@@ -1,13 +1,17 @@
 import Hero from "@/components/Hero"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import Shirts from "@/components/Shirts"
+import Featured from "@/components/Featured"
 
-const page = () => {
+interface PageProps {
+  searchParams: { [key: string]: string | undefined }
+}
+
+const page = async ({searchParams}: PageProps) => {
   return (
-     <div>  
-        <Navbar />
+     <div>   
         <Hero />
-        <Footer />
+        <Featured />
+        <Shirts searchParams = {searchParams}/>    
     </div>
     
   )
