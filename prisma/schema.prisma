@@ -7,6 +7,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
+  
 }
 
 datasource db {
@@ -38,6 +39,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
   posts         Post[]
+  carts         Cart[]
+  orders        Order[]     
+  addresses     Address[]
+  
 
   @@map("users")
 }
@@ -85,3 +90,240 @@ model Verification {
 
   @@map("verifications")
 }
+
+model Shirt {
+  id               String           @id @default(uuid())
+  name             String
+  description      String
+  isPublished      Boolean          @default(false)
+  brandId          String?
+  leagueId         String?
+  teamId           String?
+  playerId         String?
+  defaultVariantId String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  brand           Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  league          League?          @relation(fields: [leagueId], references: [id], onDelete: SetNull)
+  team            Team?            @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  player          Player?          @relation(fields: [playerId], references: [id], onDelete: SetNull)
+  variants        ShirtVariant[]   @relation("ShirtVariants")
+  images          ShirtImage[]     @relation("ShirtImages")
+
+  
+
+  @@map("shirts")
+}
+
+model ShirtVariant {
+  id          String    @id @default(uuid())
+  shirtId     String
+  sku         String    @unique
+  price       Decimal   @db.Decimal(10, 2)
+  salePrice   Decimal?  @db.Decimal(10, 2)
+  sizeId      String
+  inStock     Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  shirt       Shirt     @relation("ShirtVariants", fields: [shirtId], references: [id], onDelete: Cascade)
+  size        Size      @relation(fields: [sizeId], references: [id], onDelete: Restrict)
+  images      ShirtImage[] @relation("VariantImages")
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("shirt_variants")
+}
+
+model ShirtImage {
+  id         String   @id @default(uuid())
+  shirtId    String
+  variantId  String?
+  url        String
+  sortOrder  Int      @default(0)
+  isPrimary  Boolean  @default(false)
+
+  
+  shirt      Shirt    @relation("ShirtImages", fields: [shirtId], references: [id], onDelete: Cascade)
+  variant    ShirtVariant? @relation("VariantImages", fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@map("shirt_images")
+}
+
+model Size {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  sortOrder  Int
+  variants   ShirtVariant[]
+
+  @@map("sizes")
+}
+
+model Brand {
+  id       String   @id @default(uuid())
+  name     String
+  slug     String   @unique
+  logoUrl  String?
+  shirts   Shirt[]
+
+  @@map("brands")
+}
+
+model League {
+  id       String   @id @default(uuid())
+  name     String
+  slug     String   @unique
+  logoUrl  String?
+  teams    Team[]
+  shirts   Shirt[]
+
+  @@map("leagues")
+}
+
+model Team {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  leagueId  String
+  logoUrl   String?
+
+  league    League    @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  players   Player[]
+  shirts    Shirt[]
+
+  @@map("teams")
+}
+
+model Player {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  position  String?
+  number    Int?
+  teamId    String
+
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  shirts    Shirt[]
+
+  @@map("players")
+}
+
+model Cart {
+  id        String    @id @default(uuid())
+  userId    String?
+  guestId   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+
+  @@unique([userId])
+  @@unique([guestId])
+  @@map("carts")
+} 
+
+model CartItem {
+  id            String         @id @default(uuid())
+  cartId        String
+  variantId     String
+  quantity      Int            @default(1)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  cart          Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant       ShirtVariant   @relation(fields: [variantId], references: [id], onDelete: Restrict)
+
+  @@map("cart_items")
+}
+
+model Order {
+  id                String   @id @default(uuid())
+  userId            String?
+  status            OrderStatus @default(PENDING)
+  totalAmount       Decimal
+  createdAt         DateTime @default(now())
+
+  shippingAddressId String?
+  billingAddressId  String?
+
+  shippingAddress   Address? @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddress    Address? @relation("BillingAddress", fields: [billingAddressId], references: [id])
+
+  user              User?    @relation(fields: [userId], references: [id])
+  items             OrderItem[]
+  payments Payment[]
+}
+
+model OrderItem {
+  id              String   @id @default(uuid())
+  orderId         String
+  productVariantId String
+  quantity        Int      @default(1)
+  priceAtPurchase Decimal
+
+  order           Order    @relation(fields: [orderId], references: [id])
+  variant         ShirtVariant @relation(fields: [productVariantId], references: [id])
+}
+
+
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String?
+
+  firstName   String
+  lastName    String
+  phone       String
+
+  street      String
+  city        String
+  postalCode String
+  country     String
+
+  isDefault   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id])
+
+  shippingOrders Order[] @relation("ShippingAddress")
+  billingOrders  Order[] @relation("BillingAddress")
+}
+
+enum PaymentMethod {
+  stripe
+  paypal
+  cod
+}
+
+enum PaymentStatus {
+  initiated
+  completed
+  failed
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+
+model Payment {
+  id            String         @id @default(uuid())
+  orderId       String
+  method        PaymentMethod
+  status        PaymentStatus @default(initiated)
+  paidAt        DateTime?
+  transactionId String?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+
+
