@@ -2,6 +2,73 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --color-dark-dark: hsl(0 0% 0%);
+  --color-dark: hsl(0 0% 5%);
+  --color-dark-light: hsl(0 0% 10%);
+
+  --color-text-light: hsl(0 0% 95%);
+  --color-text-light-muted: hsl(0 0% 70%);  
+
+  --color-dark-border: hsl(0 0% 20%);
+  --color-dark-highlight: hsl(0 0% 30%);
+
+  --color-dark-muted: oklch(0.356 0 0);
+
+  /* light */
+  --color-light-ultra-dark: hsl(0 0% 83%);
+  --color-light-dark: hsl(0 0% 90%);
+  --color-light: hsl(0 0% 95%);
+  --color-light-light: hsl(0 0% 100%);
+
+  --color-text-dark: hsl(0 0% 5%);
+  --color-text-dark-muted: hsl(0 0% 40%);
+
+  --text-heading-1: 72px;
+  --text-heading-1--line-height: 78px;
+  --text-heading-1--font-weight: 700;
+
+  --text-heading-2: 56px;
+  --text-heading-2--line-height: 60px;
+  --text-heading-2--font-weight: 700;
+
+  --text-heading-3: 24px;
+  --text-heading-3--line-height: 30px;
+  --text-heading-3--font-weight: 500;
+
+  --text-lead: 20px;
+  --text-lead--line-height: 28px;
+  --text-lead--font-weight: 500;
+
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--font-weight: 400;
+
+  --text-body-medium: 16px;
+  --text-body-medium--line-height: 24px;
+  --text-body-medium--font-weight: 500;
+
+  --text-caption: 14px;
+  --text-caption--line-height: 20px;
+  --text-caption--font-weight: 500;
+
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-footnote--font-weight: 400;
+
+  --shadow-shadow-s: inset 0 1px 2px #ffffff30,
+     0 1px 2px #00000030,
+     0 2px 4px #00000015; 
+
+  --shadow-shadow-m: inset 0 1px 2px #ffffff50,
+     0 2px 4px #00000030,
+     0 4px 8px #00000015; 
+
+  --shadow-shadow-l: inset 0 1px 2px #ffffff70,
+     0 4px 6px #00000030,
+     0 6px 10px #00000015; 
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -113,9 +180,34 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+  
+}
+
+.loader_circle {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 3px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.slick-slide > div {
+  margin: 0 10px;
+}
+
+
+.slick-prev:before,
+.slick-next:before {
+  color: #000 !important; 
+  font-size: 24px !important;       
+}
+
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
