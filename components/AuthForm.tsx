@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react";
+import { useState} from "react";
 import Image from "next/image";
 import { SocialProviders } from "./SocialProviders";
 import {useRouter} from "next/navigation";
-import { HandleAuthAction } from "@/actions/authActions";
+import { HandleAuthAction } from "@/lib/actions/authActions";
 import Link from "next/link"
 
 
@@ -13,11 +13,11 @@ type Props = {
 }
 
 const AuthForm = ({mode}: Props) => {
-    const [isPending, setIsPending] = useState<Boolean>(false);
-    const [show, setShow] = useState<Boolean>(false);
-    const [hasFullNameValue, setHasFullNameValue] = useState<Boolean>(false);
-    const [hasEmailValue, setHasEmailValue] = useState<Boolean>(false);
-    const [hasPasswordValue, setHasPasswordValue] = useState<Boolean>(false);
+    const [isPending, setIsPending] = useState(false);
+    const [show, setShow] = useState(false);
+    const [hasFullNameValue, setHasFullNameValue] = useState(false);
+    const [hasEmailValue, setHasEmailValue] = useState(false);
+    const [hasPasswordValue, setHasPasswordValue] = useState(false);
     const router = useRouter();
 
 
@@ -31,7 +31,10 @@ const AuthForm = ({mode}: Props) => {
     if (result.success) {
       console.log(`User ${mode === "sign-up" ? "registered" : "signed in"} successfully`);
       if (result.redirect) router.push(result.redirect);
-    } else {
+    } else if (result.redirect) {
+      router.push(result.redirect);
+    }
+      else {
       alert(`Error: ${result.error}`);
       
     }
@@ -43,7 +46,7 @@ const AuthForm = ({mode}: Props) => {
     
   return (
     <div className="space-y-6 flex justify-center">
-         <div className="w-[70vw] max-w-md bg-light-light  rounded-lg p-8 shadow-shadow-m text-center ">
+         <div className="w-full md:[70vw] max-w-md bg-light-light rounded-lg p-8 shadow-shadow-m text-center">
             <h1 className="text-heading-3 text-dark-900 mb-4">
                 {mode === "sign-in" ? "Welcome Back!" : "Join CourtStyle Today!"}
             </h1>
@@ -75,7 +78,7 @@ const AuthForm = ({mode}: Props) => {
                 type="text"
                 placeholder="Type your full name"
                 className={`
-                  w-full rounded-xl bg-light-ultra-dark py-3 text-body text-black 
+                  w-full rounded-xl bg-light py-3 text-body text-black 
                   focus:outline-none focus:ring-1 focus:ring-offset-neutral-400 focus:bg-light
                   ${!hasFullNameValue ? "bg-[url('/fullName_placeholder.png')] bg-no-repeat bg-[length:18px_18px] bg-[position:8px_center] px-8" : "px-3"}
                 `}
@@ -94,7 +97,7 @@ const AuthForm = ({mode}: Props) => {
               type="email"
               placeholder="Type your email"
               className={`
-                w-full rounded-xl bg-light-ultra-dark  py-3 text-body text-black 
+                w-full rounded-xl bg-light  py-3 text-body text-black 
                 focus:outline-none focus:ring-1 focus:ring-offset-neutral-400 focus:bg-light
                 ${!hasEmailValue ? "bg-[url('/email_placeholder.png')] bg-no-repeat bg-[length:18px_18px] bg-[position:8px_center] px-8": "px-3"}
               `}
@@ -117,7 +120,7 @@ const AuthForm = ({mode}: Props) => {
                 onChange={(e) => setHasPasswordValue(e.target.value !== "")}
                 placeholder="Type your password"
                 className={`
-                  w-full rounded-xl bg-light-ultra-dark py-3 text-body text-black 
+                  w-full rounded-xl bg-light py-3 text-body text-black 
                   focus:outline-none focus:ring-1 focus:ring-offset-neutral-400 focus:bg-light
                   ${!hasPasswordValue ? "bg-[url('/password_placeholder.png')] bg-no-repeat bg-[length:18px_18px] bg-[position:8px_center] px-8" : "px-3"}
                 `}
