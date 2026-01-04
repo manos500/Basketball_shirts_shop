@@ -6,12 +6,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface AddToCartButtonProps {
+  teamLogoUrl: string;
   shirtName: string;
   variantId: string;
   quantity?: number;
 }
 
 export default function AddToCartButton({
+  teamLogoUrl,
   shirtName,
   variantId,
   quantity = 1,
@@ -40,13 +42,15 @@ export default function AddToCartButton({
       disabled={isPending}
       className="flex items-center justify-center gap-2 rounded-full bg-dark px-6 py-4 text-body-medium text-text-light transition hover:opacity-90 hover:cursor-pointer disabled:opacity-50"
     >
-      <Image
-        src={`/logos/nba/LosAngelesLakers.png`}
-        alt={shirtName}
-        height={35}
-        width={35}
-        priority
-      />
+      {teamLogoUrl && (
+  <Image
+    src={`/${teamLogoUrl}`} alt={shirtName}
+    height={35}
+    width={35}
+    priority
+  />
+)}
+
 
       {isPending ? (
         <div className="flex justify-center items-center gap-2">
