@@ -65,14 +65,14 @@ const Filters = () => {
           >
             Filters
           </button>
-          <button className="text-caption text-dark-700 underline" onClick={clearAll}>
+          <button className="text-caption text-dark-700 underline cursor-pointer" onClick={clearAll}>
             Clear all
           </button>
       </div>
       <aside className="sticky top-20 hidden h-fit min-w-60 rounded-lg border border-light-300 bg-light-100 p-4 md:block">
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-body-medium text-dark-900">Filters</h3>
-          <button className="text-caption text-dark-700 underline" onClick={clearAll}>
+          <button className="text-caption text-dark-700 underline cursor-pointer" onClick={clearAll}>
             Clear all
           </button>
         </div>
@@ -90,7 +90,7 @@ const Filters = () => {
                   <input
                     id={`brand-${b}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("brand", b)}
                   />
@@ -116,7 +116,7 @@ const Filters = () => {
                   <label className="inline-flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 accent-dark-900"
+                      className="h-4 w-4 accent-dark-900 cursor-pointer"
                       checked={checked}
                       onChange={() => onToggle("size", s)}
                     />
@@ -141,7 +141,7 @@ const Filters = () => {
                   <input
                     id={`league-${l}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("league", l)}
                   />
@@ -166,7 +166,7 @@ const Filters = () => {
                   <input
                     id={`team-${t}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("team", t)}
                   />
@@ -193,7 +193,7 @@ const Filters = () => {
                   <input
                     id={`price-${p.id}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("price", p.id)}
                   />
@@ -217,7 +217,7 @@ const Filters = () => {
           <div className="absolute inset-y-0 left-0 w-80 max-w-[80%] overflow-auto bg-light-100 p-4 shadow-xl">
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-body-medium">Filters</h3>
-              <button className="text-caption text-dark-700 underline" onClick={clearAll}>
+              <button className="text-caption text-dark-700 underline cursor-pointer" onClick={clearAll}>
                 Clear all
               </button>
             </div>
@@ -237,7 +237,7 @@ const Filters = () => {
                   <input
                     id={`brand-${b}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("brand", b)}
                   />
@@ -263,7 +263,7 @@ const Filters = () => {
                   <label className="inline-flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 accent-dark-900"
+                      className="h-4 w-4 accent-dark-900 cursor-pointer"
                       checked={checked}
                       onChange={() => onToggle("size", s)}
                     />
@@ -288,7 +288,7 @@ const Filters = () => {
                   <input
                     id={`league-${l}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("league", l)}
                   />
@@ -313,7 +313,7 @@ const Filters = () => {
                   <input
                     id={`team-${t}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("team", t)}
                   />
@@ -342,7 +342,7 @@ const Filters = () => {
                   <input
                     id={`price-${p.id}`}
                     type="checkbox"
-                    className="h-4 w-4 accent-dark-900"
+                    className="h-4 w-4 accent-dark-900 cursor-pointer"
                     checked={checked}
                     onChange={() => onToggle("price", p.id)}
                   />
