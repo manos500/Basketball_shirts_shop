@@ -5,7 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import dynamic from "next/dynamic";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+
 
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
@@ -13,8 +15,9 @@ const Slider = dynamic(() => import("react-slick"), { ssr: false });
 type FeaturedItem = {
   id: string;
   name: string;
-  mainImage?: string; // for shirts
-  logoUrl?: string;   // for teams
+  slug?: string;
+  mainImage?: string; 
+  logoUrl?: string;   
   description?: string;
   price?: number;
 };
@@ -26,6 +29,7 @@ interface FeaturedProps {
 
 const Featured = ({ items, type }: FeaturedProps) => {
   const [isMobile, setIsMobile] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -50,6 +54,17 @@ const Featured = ({ items, type }: FeaturedProps) => {
     slidesPerRow: 2,
   };
 
+   const handleItemClick = (item: FeaturedItem) => {
+    if (type === "team") {
+      // Use slug if available, otherwise fallback to lowercase name
+      const teamSlug = item.slug || item.name.toLowerCase().replace(/\s+/g, "-");
+      router.push(`/shirts?team=${teamSlug}`);
+    } else {
+      // Handle shirt click - navigate to shirt detail page
+      router.push(`/shirts/${item.id}`);
+    }
+  };
+
   const settings = isMobile ? mobileSettings : desktopSettings;
 
   return (
@@ -58,14 +73,16 @@ const Featured = ({ items, type }: FeaturedProps) => {
         <Slider className="p-0" key={isMobile ? "mobile" : "desktop"} {...settings}>
           {items.map((item) => (
             <div key={item.id} className="p-1">
-              <Card className="max-w-sm overflow-hidden shadow-lg rounded-lg ">
+              <Card className="max-w-sm overflow-hidden shadow-lg rounded-lg "
+              onClick={() => handleItemClick(item)}>
                 <CardContent className="min-h-[30vh] xl:min-h-[32vh] space-y-5 md:space-y-0 xl:space-y-5">
                   <div className="relative w-full h-30 sm:h-50  rounded-lg overflow-hidden ">
                     <Image
                       src={`/${type === "shirt" ? item.mainImage : item.logoUrl}`}
                       alt={item.name}
                       fill
-                      className="object-contain group-hover:scale-105 max-h-50 max-w-50 transition-transform duration-300 ease-in-out self-center mx-auto"
+                      className="object-contain hover:scale-105 max-h-25 max-w-25 sm:max-h-45 sm:max-w-45 transition-transform duration-300 ease-in-out self-center mx-auto hover:cursor-pointer"
+                      
                     />
                   </div>
                   {type === "team" && (
