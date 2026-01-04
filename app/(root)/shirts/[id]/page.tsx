@@ -1,20 +1,15 @@
-import { getShirt } from "@/lib/actions/shirt";
-import ShirtCard from "@/components/ShirtCard";
-
+import { getFeaturedShirts, getShirt } from "@/lib/actions/shirt";
+import Featured from "@/components/Featured";
 import ProductGallery from "@/components/ProductGallery";
 import { Suspense } from "react";
 import Link from "next/link";
-import SizePicker from "@/components/SizePicker";
-import Image from "next/image";
 import ShirtDetail from "@/components/ShirtDetail";
-
-
-type Gallery = string[];
 
 
 const ShirtDetailPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   const shirt = await getShirt(id);
+  const featuredShirts = await getFeaturedShirts(id);
 
     if (!shirt) {
     return (
@@ -49,7 +44,7 @@ const ShirtDetailPage = async ({ params }: { params: Promise<{ id: string }> }) 
   return (
     <div className='mx-auto container pt-20 lg:pt-30 pb-12 px-4 sm:px-6 lg:px-8 min-h-screen'>
       <nav className="py-4 text-caption text-dark-700">
-        <Link href="/" className="hover:underline">Home</Link> / <Link href="/products" className="hover:underline">Products</Link> /{" "}
+        <Link href="/" className="hover:underline">Home</Link> / <Link href="/shirts" className="hover:underline">Shirts</Link> /{" "}
         <span className="text-dark-900">{shirt.name}</span>
       </nav>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_480px]">
@@ -72,10 +67,10 @@ const ShirtDetailPage = async ({ params }: { params: Promise<{ id: string }> }) 
       >
         <section className="mt-16">
           <h2 className="mb-6 text-heading-3 text-dark-900">You Might Also Like</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       
-            <ShirtCard key={shirt.id} shirt={shirt} />
-          </div>
+            
+            <Featured items={featuredShirts} type="shirt"/>
+      
         </section>
       </Suspense>
     </div>
