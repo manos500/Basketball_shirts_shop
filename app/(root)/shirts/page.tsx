@@ -3,6 +3,7 @@ import Filters from "@/components/Filters";
 import { parseFilterParams } from "@/lib/utils/query";
 import { getAllShirts } from "@/lib/actions/shirt";
 import ShirtCard from "@/components/ShirtCard";
+import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -11,8 +12,18 @@ const page = async ({searchParams}: {
 }) => {
     const sp = await searchParams;
     const parsed = parseFilterParams(sp);
+    const currentPage = Number(sp.page ?? 1);
+    const pageSize = Number(sp.pageSize ?? 6);
 
-    const { shirts, totalCount } = await getAllShirts(parsed);
+    const offset = (currentPage - 1) * pageSize;
+
+    console.log('Parsed filters:', currentPage, pageSize, offset);
+
+    const { shirts, totalCount } = await getAllShirts({
+    ...parsed,
+    limit: pageSize,
+    offset,
+  });
 
     const activeBadges: string[] = [];
 
@@ -58,13 +69,26 @@ const page = async ({searchParams}: {
       <p className="text-body text-dark-700">No products match your filters.</p>
     </div>
   ) : (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-6">
-      {shirts.map((shirt) => (
-        <ShirtCard key={shirt.id} shirt={shirt} />
-      ))}
-    </div>
+    <>
+        {/* PRODUCTS GRID */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-6">
+          {shirts.map((shirt) => (
+            <ShirtCard key={shirt.id} shirt={shirt} />
+          ))}
+        </div>
+
+        {/* PAGINATION */}
+        <div className="flex justify-center pt-6">
+          <PaginationWithLinks
+            page={currentPage}
+            pageSize={pageSize}
+            totalCount={totalCount}
+          />
+        </div>
+      </>
   )}
 </div>
+
       </section>
     </div>
   )
