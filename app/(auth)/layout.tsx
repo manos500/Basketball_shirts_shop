@@ -25,7 +25,7 @@ const Authlayout = ({ children }: { children: React.ReactNode }) => {
         </p>
       </section>
 
-      <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8 bg-light-dark">
+      <section className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-8 bg-light">
         <div className="w-full max-w-md">{children}</div>
       </section>
     </main>
