@@ -2,7 +2,7 @@
 
 import { useGetCartById } from "@/lib/hooks/useGetCartById";
 import { useSession } from "@/lib/auth-client";
-import { PAYMENT_METHODS } from "@/lib/type";
+import { PAYMENT_METHODS } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { useRemoveFromCart } from "@/lib/hooks/useRemoveFromCart";
@@ -29,7 +29,7 @@ const Cart = () => {
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_480px]">
       
-      <div className="flex flex-col relative w-full rounded-xl bg-light-200 gap-4 p-4">
+      <div className="flex flex-col relative w-full rounded-xl bg-light gap-4 p-4 shadow-lg">
         {cart.items.map((item) => {
           const primaryShirtImage =
             item.variant.shirt.images.find((img) => img.isPrimary) ||
