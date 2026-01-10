@@ -58,7 +58,7 @@ const handlePlaceOrder = () => {
 
 
   return (
-    <div className="mx-auto container pt-20 lg:pt-30 pb-12 px-4 sm:px-6 lg:px-8 min-h-screen bg-light">
+    <div className="mx-auto container pt-20 lg:pt-30 pb-12 px-4 sm:px-6 lg:px-8 min-h-screen bg-light-light">
       <h1 className="text-heading-3 text-dark mb-10">Secure checkout</h1>
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_480px]">
         <div className="flex flex-col ">
