@@ -3,7 +3,7 @@
 import { Button } from "./ui/button";
 import { TrashIcon } from "lucide-react";
 import { useState } from "react";
-import {deleteUserAction} from "@/lib/actions/delete-user.action";
+import { deleteUserAction } from "@/lib/actions/user";
 
 interface DeleteUserButtonProps {
     userId: string;
