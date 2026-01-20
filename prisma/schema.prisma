@@ -91,7 +91,7 @@ model Shirt {
   id               String           @id @default(uuid())
   name             String
   description      String
-  isPublished      Boolean          @default(false)
+  isPublished      Boolean          @default(true)
   brandId          String?
   leagueId         String?
   teamId           String?
@@ -119,7 +119,7 @@ model ShirtVariant {
   price       Decimal   @db.Decimal(10, 2)
   salePrice   Decimal?  @db.Decimal(10, 2)
   sizeId      String
-  inStock     Int       @default(0)
+  inStock     Int       @default(100)
   createdAt   DateTime  @default(now())
 
   shirt       Shirt     @relation("ShirtVariants", fields: [shirtId], references: [id], onDelete: Cascade)
@@ -179,7 +179,7 @@ model League {
 
 model Team {
   id        String    @id @default(uuid())
-  name      String
+  name      String    
   slug      String    @unique
   leagueId  String
   logoUrl   String?
@@ -195,14 +195,23 @@ model Player {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
-  position  String?
+  positionId  String?
   number    Int?
   teamId    String
 
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   shirts    Shirt[]
+  position  Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
 
   @@map("players")
+}
+
+model Position {
+  id       String   @id @default(uuid())
+  name     String
+  slug     String   @unique
+  players  Player[]   
+  @@map("positions")
 }
 
 model Cart {
