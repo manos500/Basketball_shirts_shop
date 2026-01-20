@@ -1,15 +1,28 @@
 import Sort from "@/components/Sort";
+import { auth } from '@/lib/auth';
 import Filters from "@/components/Filters";
 import { parseFilterParams } from "@/lib/utils/query";
 import { getAllShirts } from "@/lib/actions/shirt";
+import Image from "next/image";
 import ShirtCard from "@/components/ShirtCard";
+import Link from 'next/link';
+import { headers } from 'next/headers';
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
+import SearchInput from "@/components/SearchInput";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
 const page = async ({searchParams}: {
   searchParams: Promise<SearchParams>;
 }) => {
+  
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const isAdmin = session?.user?.role === 'ADMIN';
+
+    
     const sp = await searchParams;
     const parsed = parseFilterParams(sp);
     const currentPage = Number(sp.page ?? 1);
@@ -17,10 +30,9 @@ const page = async ({searchParams}: {
 
     const offset = (currentPage - 1) * pageSize;
 
-    console.log('Parsed filters:', currentPage, pageSize, offset);
-
     const { shirts, totalCount } = await getAllShirts({
     ...parsed,
+    search: typeof sp.search === 'string' ? sp.search : undefined,
     limit: pageSize,
     offset,
   });
@@ -45,7 +57,19 @@ const page = async ({searchParams}: {
   return (
     <div className='mx-auto container pt-20 lg:pt-30 pb-12 px-4 sm:px-6 lg:px-8 min-h-screen'>
          <header className="flex items-center justify-between py-6">
-        <h1 className="text-heading-3 text-dark-900">New</h1>
+           {isAdmin && (
+          <Link 
+            href="/admin/jerseys"
+            className="inline-flex items-center gap-1.5 sm:gap-2  sm:px-4 py-1.5 sm:py-2 bg-white text-text-dark rounded-lg transition-colors text-xs sm:text-sm font-medium border border-black"
+          >       
+            <Image src="/add.png" alt="NextRide" width={20} height={20} priority className="sm:w-[27px] sm:h-[27px]" />         
+            Add Jerseys
+          </Link>
+          )}
+          <div className="">
+             <SearchInput/>
+          </div>
+        
         <Sort />
       </header>
 
@@ -70,14 +94,12 @@ const page = async ({searchParams}: {
     </div>
   ) : (
     <>
-        {/* PRODUCTS GRID */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 pb-6">
           {shirts.map((shirt) => (
-            <ShirtCard key={shirt.id} shirt={shirt} />
+            <ShirtCard key={shirt.id} shirt={shirt} isAdmin={isAdmin}/>
           ))}
         </div>
 
-        {/* PAGINATION */}
         <div className="flex justify-center pt-6">
           <PaginationWithLinks
             page={currentPage}
