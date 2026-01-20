@@ -7,11 +7,13 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { motion, useInView } from "framer-motion"
+import { useRef } from "react"
 
 
 const Slider = dynamic(() => import("react-slick"), { ssr: false });
 
-// Generic type for Featured items
+
 type FeaturedItem = {
   id: string;
   name: string;
@@ -30,6 +32,8 @@ interface FeaturedProps {
 const Featured = ({ items, type }: FeaturedProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -56,11 +60,9 @@ const Featured = ({ items, type }: FeaturedProps) => {
 
    const handleItemClick = (item: FeaturedItem) => {
     if (type === "team") {
-      // Use slug if available, otherwise fallback to lowercase name
       const teamSlug = item.slug || item.name.toLowerCase().replace(/\s+/g, "-");
       router.push(`/shirts?team=${teamSlug}`);
     } else {
-      // Handle shirt click - navigate to shirt detail page
       router.push(`/shirts/${item.id}`);
     }
   };
@@ -69,7 +71,14 @@ const Featured = ({ items, type }: FeaturedProps) => {
 
   return (
     <div className="bg-light-light">
-      <div className="container mx-auto flex flex-col pb-12 px-8 sm:px-10 lg:px-8 ">
+      <motion.div ref={ref}
+      initial={{ opacity: 0, y: 58 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{
+        duration: 0.8,
+        ease: "easeOut",
+
+      }} className="container mx-auto flex flex-col pb-12 px-8 sm:px-10 lg:px-8 ">
         <Slider className="p-0" key={isMobile ? "mobile" : "desktop"} {...settings}>
           {items.map((item) => (
             <div key={item.id} className="p-1">
@@ -102,7 +111,7 @@ const Featured = ({ items, type }: FeaturedProps) => {
             </div>
           ))}
         </Slider>
-      </div>
+      </motion.div>
     </div>
   );
 };
