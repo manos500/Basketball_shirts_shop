@@ -2,7 +2,10 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { nextCookies } from "better-auth/next-js";
-import { sendEmailAction } from "@/actions/send-email.action";
+import { sendEmailAction } from "@/lib/actions/send-email.action";
+import { admin } from "better-auth/plugins"
+import { UserRole } from "./generated/prisma";
+import {ac, roles } from "./permissions";
 
 
 export const auth = betterAuth({
@@ -41,9 +44,33 @@ export const auth = betterAuth({
         })
       }
     },
+     advanced: {
+        ipAddress: {
+          ipAddressHeaders: ["cf-connecting-ip"], 
+      },
+    },
+    rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 100,
+    },
+    user: {
+      additionalFields: {
+        role: {
+          type: ["USER", "ADMIN"],
+          input: false,
+        },
+      },
+    },
     providers: {
       email: true,
     },
+    session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, 
+    },
+  },
     socialProviders: {
     google: {
       prompt: "select_account", 
@@ -51,5 +78,14 @@ export const auth = betterAuth({
       clientSecret: String(process.env.GOOGLE_CLIENT_SECRET),
     },
   },
-    plugins: [nextCookies()],
+    plugins: [
+      nextCookies(), 
+      admin({
+        defaultRole: UserRole.USER,
+        adminRoles: UserRole.ADMIN,
+        ac,
+        roles,
+      }),
+    ],
+    
 });
