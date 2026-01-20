@@ -13,6 +13,171 @@ export const PAYMENT_METHODS = [
   },
 ];
 
+export const OPTIONS = [
+  { label: "Featured", value: "featured" },
+  { label: "Newest", value: "newest" },
+  { label: "Price (High → Low)", value: "price_desc" },
+  { label: "Price (Low → High)", value: "price_asc" },
+]
+
+export const POSITIONS = [
+  "Point Guard",
+  "Shooting Guard",
+  "Small Forward",
+  "Power Forward",
+  "Center"
+]
+
+export const BRANDS = [
+  "Nike",
+  "Adidas", 
+] 
+
+export const LEAGUES = [
+  "NBA", 
+  "EuroLeague"
+] 
+
+export const TEAMS = [
+  "Atlanta Hawks",
+  "Boston Celtics",
+  "Brooklyn Nets",
+  "Charlotte Hornets",
+  "Chicago Bulls",
+  "Cleveland Cavaliers",
+  "Dallas Mavericks",
+  "Denver Nuggets",
+  "Detroit Pistons",
+  "Golden State Warriors",
+  "Houston Rockets",
+  "Indiana Pacers",
+  "Los Angeles Clippers",
+  "Los Angeles Lakers",
+  "Memphis Grizzlies",
+  "Miami Heat",
+  "Milwaukee Bucks",
+  "Minnesota Timberwolves",
+  "New Orleans Pelicans",
+  "New York Knicks",
+  "Oklahoma City Thunder",
+  "Orlando Magic",
+  "Philadelphia 76ers",
+  "Phoenix Suns",
+  "Portland Trail Blazers",
+  "Sacramento Kings",
+  "San Antonio Spurs",
+  "Toronto Raptors",
+  "Utah Jazz",
+  "Washington Wizards",
+  "Anadolu Efes",
+  "AS Monaco",
+  "Baskonia",
+  "Bayern Munich",
+  "Crvena Zvezda",
+  "Barcelona",
+  "Fenerbahce",
+  "Partizan Mozzart",
+  "Maccabi Tel Aviv",
+  "Olympiacos",
+  "Panathinaikos",
+  "Real Madrid",
+  "Valencia Basket",
+  "Virtus Bologna",
+  "Zalgiris Kaunas",
+  "Armani Milano",
+  "ASVEL Villeurbanne",
+  "Hapoel IBI Tel Aviv",
+  "Paris Basketball",
+  "Dubai Basketball"
+];
+
+export const POSITION_SLUG: Record<string, string> = {
+  "Point Guard": "pg",
+  "Shooting Guard": "sg",
+  "Small Forward": "sf",
+  "Power Forward": "pf",
+  "Center": "c",
+}
+
+export const IMAGE_VARIANTS = ["main", "front", "back"];
+
+export const TEAM_SLUGS: Record<string, string> = {
+  "Atlanta Hawks": "hawks",
+  "Boston Celtics": "celtics",
+  "Chicago Bulls": "bulls",
+  "Cleveland Cavaliers": "cavaliers",
+  "Dallas Mavericks": "mavericks",
+  "Denver Nuggets": "nuggets",
+  "Detroit Pistons": "pistons",
+  "Golden State Warriors": "warriors",
+  "Houston Rockets": "rockets",
+  "Indiana Pacers": "pacers",
+  "Los Angeles Clippers": "clippers",
+  "Los Angeles Lakers": "lakers",
+  "Memphis Grizzlies": "grizzlies",
+  "Miami Heat": "heat",
+  "Milwaukee Bucks": "bucks",
+  "Minnesota Timberwolves": "timberwolves",
+  "New Orleans Pelicans": "pelicans",
+  "New York Knicks": "knicks",
+  "Oklahoma City Thunder": "thunder",
+  "Orlando Magic": "magic",
+  "Philadelphia 76ers": "sixers",
+  "Phoenix Suns": "suns",
+  "Portland Trail Blazers": "blazers",
+  "Sacramento Kings": "kings",
+  "San Antonio Spurs": "spurs",
+  "Toronto Raptors": "raptors",
+  "Utah Jazz": "jazz",
+  "Washington Wizards": "wizards",
+   "Anadolu Efes": "efes",
+  "AS Monaco": "monaco",
+  "Baskonia": "baskonia",
+  "Bayern Munich": "bayern",
+  "Crvena Zvezda": "crvena zvezda",
+  "Barcelona": "barcelona",
+  "Fenerbahce": "fenerbahce",
+  "Partizan Mozzart": "partizan",
+  "Maccabi Tel Aviv": "maccabi",
+  "Olympiacos": "olympiacos",
+  "Panathinaikos": "panathinaikos",
+  "Real Madrid": "real",
+  "Valencia Basket": "valencia",
+  "Virtus Bologna": "virtus",
+  "Zalgiris Kaunas": "zalgiris",
+  "Armani Milano": "armani",
+  "ASVEL Villeurbanne": "villeurbanne",
+  "Hapoel IBI Tel Aviv": "hapoel",
+  "Paris Basketball": "paris",
+  "Dubai Basketball": "dubai",
+};
+
+export const LEAGUE_SLUGS: Record<string, string> = {
+  "NBA": "nba",
+  "EuroLeague": "euroleague",
+};
+
+export const BRAND_SLUGS: Record<string, string> = {
+  "Nike": "nike",
+  "Adidas": "adidas",
+  "Puma": "puma",
+};
+
+
+export const SIZES = [
+  "S", 
+  "M", 
+  "L", 
+  "XL"
+] 
+
+export const PRICES = [
+  { id: "0-50", label: "$0 - $50" },
+  { id: "50-100", label: "$50 - $100" },
+  { id: "100-150", label: "$100 - $150" },
+  { id: "150-", label: "Over $150" },
+] 
+
 export const COUNTRIES = [
   "Albania",
   "Andorra",
