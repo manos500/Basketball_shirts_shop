@@ -27,3 +27,17 @@ export interface FeaturedItem {
   maxPrice?: number;
 };
 
+export interface CreateShirtInput {
+  playerName: string;
+  positionName: string;
+  jerseyNumber: number;
+  name: string;
+  description: string;
+  brandName: string;
+  leagueName: string;
+  teamName: string;
+  basePrice: number;
+  sku: string;
+  imageUrls: string[];
+}
+
