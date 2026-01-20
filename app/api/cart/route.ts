@@ -1,47 +1,50 @@
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 import { addToCart, getCart } from "@/lib/actions/cart";
-import { auth } from "@/lib/auth";
+import { withAuth, withOptionalAuth } from "@/lib/api-auth";
 
-export async function POST(req: Request) {
+
+export const POST = withOptionalAuth(async (request: NextRequest, session) => {
   try {
-    const body = await req.json();
-    const { variantId, quantity } = body;
+    const body = await request.json();
+    const { variantId, quantity, guestId } = body;
 
     if (!variantId || !quantity) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" }, 
+        { status: 400 }
+      );
     }
 
-    const session = await auth.api.getSession({ headers: await headers() });
     const userId = session?.user?.id;
 
-    const guestId = body.guestId;
+    if (!userId && !guestId) {
+      return NextResponse.json(
+        { error: "Either authentication or guestId is required" }, 
+        { status: 400 }
+      );
+    }
 
     const cart = await addToCart({ userId, guestId, variantId, quantity });
 
     return NextResponse.json(cart);
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to add to cart" }, { status: 500 });
+    console.error("Add to cart error:", err);
+    return NextResponse.json(
+      { error: "Failed to add to cart" }, 
+      { status: 500 }
+    );
   }
-}
+});
 
-export async function GET(req: Request) {
+export const GET = withAuth(async (request, session) => {
   try {
-    
-    const session = await auth.api.getSession({ headers: await headers() });
-
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = session.user.id;
-
-    const cart = await getCart(userId);
-
+    const cart = await getCart(session.user.id);
     return NextResponse.json(cart);
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to fetch cart" }, { status: 500 });
+    console.error("Get cart error:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch cart" }, 
+      { status: 500 }
+    );
   }
-}
+});
