@@ -7,6 +7,7 @@ import { useGetAddress } from "@/lib/hooks/useGetAddress";
 import { useState } from "react";
 import { useCreateOrder } from "@/lib/hooks/useCreateOrder";
 import { useRouter } from "next/navigation";
+import { validateCardNumber, validateExpiryDate, validateCVV, sanitizeString } from "@/lib/validation";
 
 
 
@@ -15,6 +16,9 @@ const formatPrice = (price: number) => `${price.toFixed(2)}€`;
 const PaymentPage = () => {
   const router = useRouter();
   const [creditCardSelected, setCreditCardSelected] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string>("");
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const { data: cart, isLoading, isError } = useGetCartById(userId);
@@ -40,21 +44,80 @@ const PaymentPage = () => {
 
   const totalItems = cart.items.reduce((sum: number, item) => sum + item.quantity, 0);
 
-const handlePlaceOrder = () => {
-  createOrder(
-    {
-      userId,
-      shippingAddressId: address.id,
-      billingAddressId: address.id,
-      paymentMethod: "cod",
-    },
-    {
-      onSuccess: (data) => {
-        router.push(`/order-success`);
-      },
+  const handlePaymentMethodChange = (method: string) => {
+    setSelectedPaymentMethod(method)
+    setCreditCardSelected(method === "credit_card");
+    setFieldErrors({});
+    setGeneralError("");
+  }
+
+  const validateCreditCardFields = () => {
+    const errors: Record<string, string> = {};
+
+    const cardNumberInput = document.querySelector('input[name="cardNumber"]') as HTMLInputElement;
+    const expiryInput = document.querySelector('input[name="expiry"]') as HTMLInputElement;
+    const cvvInput = document.querySelector('input[name="cvv"]') as HTMLInputElement;
+
+    if (cardNumberInput) {
+      const cardValidation = validateCardNumber(cardNumberInput.value);
+      if (!cardValidation.isValid) {
+        errors.cardNumber = cardValidation.error!;
+      }
     }
-  );
-};
+    
+    if (expiryInput) {
+      const expiryValidation = validateExpiryDate(expiryInput.value);
+      if (!expiryValidation.isValid) {
+        errors.expiry = expiryValidation.error!;
+      }
+    }
+    
+    if (cvvInput) {
+      const cvvValidation = validateCVV(cvvInput.value);
+      if (!cvvValidation.isValid) {
+        errors.cvv = cvvValidation.error!;
+      }
+    }
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  const handlePlaceOrder = () => {
+    setGeneralError("");
+    setFieldErrors({});
+    
+    if (!selectedPaymentMethod) {
+      setGeneralError("Please select a payment method");
+      return;
+    }
+    
+    if (creditCardSelected) {
+      if (!validateCreditCardFields()) {
+        setGeneralError("Please fix the credit card errors below");
+        return;
+      }
+    }
+    
+    const sanitizedPaymentMethod = sanitizeString(selectedPaymentMethod);
+    
+    createOrder(
+      {
+        userId,
+        shippingAddressId: address.id,
+        billingAddressId: address.id,
+        paymentMethod: sanitizedPaymentMethod === "credit_card" ? "card" : sanitizedPaymentMethod,
+      },
+      {
+        onSuccess: (data) => {
+          router.push(`/order-success`);
+        },
+        onError: (error: any) => {
+          setGeneralError(error.message || "Failed to place order. Please try again.");
+        }
+      }
+    );
+  };
 
 
   return (
@@ -73,45 +136,71 @@ const handlePlaceOrder = () => {
           <div className="border border-gray-300 px-6 py-2">
           <div className="flex flex-col gap-4 py-2">
             <label className="flex items-center gap-2">
-              <input type="radio" name="payment" value="paypal" className="accent-red-600" onChange={() => setCreditCardSelected(false)}/>
+              <input type="radio" name="payment" value="paypal" className="accent-red-600" onChange={() => handlePaymentMethodChange("paypal")}
+                  checked={selectedPaymentMethod === "paypal"}/>
               PayPal
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="payment" value="klarna" className="accent-red-600" onChange={() => setCreditCardSelected(false)}/>
+              <input type="radio" name="payment" value="klarna" className="accent-red-600" onChange={() => handlePaymentMethodChange("klarna")}
+                  checked={selectedPaymentMethod === "klarna"}/>
               Klarna
             </label>
             <label className="flex items-center gap-2">
-              <input type="radio" name="payment" value="credit_card" className="accent-red-600" onChange={() => setCreditCardSelected(true)}/>
+              <input type="radio" name="payment" value="credit_card" className="accent-red-600" onChange={() => handlePaymentMethodChange("credit_card")}
+                  checked={selectedPaymentMethod === "credit_card"}/>
               Credit Card (Visa / MasterCard / and more)
             </label>
           </div>
           {creditCardSelected && (
-            <div className="flex flex-col gap-4 mt-4">
-            <input
-              type="text"
-              name="cardNumber"
-              required
-              placeholder="Card Number"
-              className="w-full p-3 border border-neutral-400 rounded"
-            />
-            <div className="flex gap-4">
-              <input
-                type="text"
-                required
-                name="expiry"
-                placeholder="MM/YY"
-                className="w-1/2 p-3 border border-neutral-400 rounded"
-              />
-              <input
-                type="text"
-                required
-                name="cvv"
-                placeholder="CVV"
-                className="w-1/2 p-3 border border-neutral-400 rounded"
-              />
-            </div>
-          </div>
-          )}
+              <div className="flex flex-col gap-4 mt-4">
+                <div>
+                  <input
+                    type="text"
+                    name="cardNumber"
+                    required
+                    placeholder="Card Number"
+                    maxLength={19}
+                    className={`w-full p-3 border rounded ${fieldErrors.cardNumber ? "border-red-500" : "border-neutral-400"}`}
+                    onChange={() => setFieldErrors({ ...fieldErrors, cardNumber: "" })}
+                  />
+                  {fieldErrors.cardNumber && (
+                    <p className="text-sm text-red-500 mt-1">{fieldErrors.cardNumber}</p>
+                  )}
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="w-1/2">
+                    <input
+                      type="text"
+                      required
+                      name="expiry"
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      className={`w-full p-3 border rounded ${fieldErrors.expiry ? "border-red-500" : "border-neutral-400"}`}
+                      onChange={() => setFieldErrors({ ...fieldErrors, expiry: "" })}
+                    />
+                    {fieldErrors.expiry && (
+                      <p className="text-sm text-red-500 mt-1">{fieldErrors.expiry}</p>
+                    )}
+                  </div>
+                  
+                  <div className="w-1/2">
+                    <input
+                      type="text"
+                      required
+                      name="cvv"
+                      placeholder="CVV"
+                      maxLength={4}
+                      className={`w-full p-3 border rounded ${fieldErrors.cvv ? "border-red-500" : "border-neutral-400"}`}
+                      onChange={() => setFieldErrors({ ...fieldErrors, cvv: "" })}
+                    />
+                    {fieldErrors.cvv && (
+                      <p className="text-sm text-red-500 mt-1">{fieldErrors.cvv}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
            
           <h2 className="font-medium text-dark mt-4 text-lg">Billing Address</h2>
           <label className="flex items-center gap-2 mt-2">
@@ -171,13 +260,17 @@ const handlePlaceOrder = () => {
           return (
 
               <div key={item.id} className="flex justify-between flex-col-2 ">
-                <Image
-                  src={imageUrl}
-                  alt={item.variant.shirt.name}
-                  width={100}
-                  height={100}
-                  className="object-cover rounded-md"
-                />
+               <Image
+                src={imageUrl}
+                alt={item.variant.shirt.name}
+                width={100}
+                height={100}
+                className="
+                  object-cover rounded-md
+                  w-25 h-25
+                  md:w-34 md:h-34
+                "
+              />
                 <div className="space-y-2">
                   <p>{item.variant.shirt.name}</p>
                   <p className="text-dark font-medium">{formatPrice((item.variant.salePrice ?? item.variant.price) * item.quantity)}</p>
