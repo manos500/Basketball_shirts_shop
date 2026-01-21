@@ -248,3 +248,34 @@ export const validateImageFile = (
   return { isValid: true };
 }
 
+export const validateJerseyNumber = (number: number): { isValid: boolean; error?: string } => {
+  if (isNaN(number) || number < 0 || number > 100) {
+    return { isValid: false, error: "Jersey number must be between 0 and 100" };
+  }
+  return { isValid: true };
+};
+
+export const validatePrice = (price: number): { isValid: boolean; error?: string } => {
+  if (isNaN(price) || price < 0) {
+    return { isValid: false, error: "Price must be a positive number" };
+  }
+  if (price > 10000) {
+    return { isValid: false, error: "Price seems unreasonably high" };
+  }
+  return { isValid: true };
+};
+
+export const validateSKU = (sku: string): { isValid: boolean; error?: string } => {
+  const sanitized = sanitizeString(sku);
+  if (sanitized.length === 0) {
+    return { isValid: false, error: "SKU is required" };
+  }
+  if (!/^[A-Z0-9\-_]+$/i.test(sanitized)) {
+    return { isValid: false, error: "SKU can only contain letters, numbers, hyphens, and underscores" };
+  }
+  if (sanitized.length > 15) {
+    return { isValid: false, error: "SKU must be 15 characters or less" };
+  }
+  return { isValid: true };
+};
+
