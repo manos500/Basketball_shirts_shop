@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { validateImageFile } from "@/lib/validation";
+import { validateImageFile, validateSKU, validatePrice, validateJerseyNumber, sanitizeString, validateLength } from "@/lib/validation";
 import { BRANDS, LEAGUES, POSITIONS, TEAMS } from "@/lib/constants";
 
 const AddJersey = () => {
@@ -10,26 +10,103 @@ const AddJersey = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string>("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const maxFiles = 3;
   const maxSizeMB = 5;
 
+  const validateFormData = (formData: FormData): {isValid: boolean, errors: Record<string, string>} => {
+    const errors: Record<string, string> = {}
+
+    const playerName = sanitizeString(formData.get("PlayerName") as string)
+
+    if (!validateLength(playerName, 1, 50)) {
+      errors.PlayerName = "Player name must be between 1 and 50 characters";
+    }
+
+    const jerseyNumber = Number(formData.get("JerseyNumber"));
+    const jerseyValidation = validateJerseyNumber(jerseyNumber);
+    if (!jerseyValidation.isValid) {
+      errors.JerseyNumber = jerseyValidation.error!;
+    }
+
+    const jerseyName = sanitizeString(formData.get("jerseyName") as string);
+    if (!validateLength(jerseyName, 1, 50)) {
+      errors.jerseyName = "Jersey name must be between 1 and 50 characters";
+    }
+
+    const description = sanitizeString(formData.get("jerseyDescription") as string);
+    if (!validateLength(description, 1, 300)) {
+      errors.jerseyDescription = "Description must be between 1 and 300 characters";
+    }
+
+    const price = Number(formData.get("price"));
+    const priceValidation = validatePrice(price);
+    if (!priceValidation.isValid) {
+      errors.price = priceValidation.error!;
+    }
+
+    const sku = formData.get("sku") as string;
+    const skuValidation = validateSKU(sku);
+    if (!skuValidation.isValid) {
+      errors.sku = skuValidation.error!;
+    }
+
+    const position = formData.get("position") as string;
+    if (!POSITIONS.includes(position)) {
+      errors.position = "Invalid position selected";
+    }
+
+    const brand = formData.get("brand") as string;
+    if (!BRANDS.includes(brand)) {
+      errors.brand = "Invalid brand selected";
+    }
+
+    const league = formData.get("league") as string;
+    if (!LEAGUES.includes(league)) {
+      errors.league = "Invalid league selected";
+    }
+
+    const team = formData.get("team") as string;
+    if (!TEAMS.includes(team)) {
+      errors.team = "Invalid team selected";
+    }
+
+    if (previews.length === 0) {
+      errors.images = "At least one image is required";
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setFieldErrors({});
+    setError("");
 
     const formData = new FormData(e.currentTarget);
 
+    const validation = validateFormData(formData);
+    if (!validation.isValid) {
+      setFieldErrors(validation.errors);
+      setError("Please fix the errors below");
+      return;
+    }
+
     const data = {
-      playerName: formData.get("PlayerName") as string,
+      playerName: sanitizeString(formData.get("PlayerName") as string),
       positionName: formData.get("position") as string,
       jerseyNumber: Number(formData.get("JerseyNumber")),
-      name: formData.get("jerseyName") as string,
-      description: formData.get("jerseyDescription") as string,
+      name: sanitizeString(formData.get("jerseyName") as string),
+      description: sanitizeString(formData.get("jerseyDescription") as string),
       brandName: formData.get("brand") as string,
       leagueName: formData.get("league") as string,
       teamName: formData.get("team") as string,
       basePrice: Number(formData.get("price")),
-      sku: formData.get("sku") as string,
+      sku: sanitizeString(formData.get("sku") as string),
       imageUrls: previews,
     };
 
