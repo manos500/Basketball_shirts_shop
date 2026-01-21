@@ -1,25 +1,23 @@
 export const sanitizeString = (input: string): string => {
   return input
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove event handlers like onclick=
+    .replace(/<[^>]*>/g, '') 
+    .replace(/javascript:/gi, '') 
+    .replace(/on\w+\s*=/gi, '')
     .trim();
 };
 
 export const sanitizeSearchQuery = (query: string): string => {
   return query
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove event handlers
-    .replace(/[<>'"]/g, '') // Remove quotes and angle brackets
+    .replace(/<[^>]*>/g, '') 
+    .replace(/javascript:/gi, '') 
+    .replace(/on\w+\s*=/gi, '') 
+    .replace(/[<>'"]/g, '') 
     .trim();
 };
 
 export const validateSearchQuery = (query: string): boolean => {
-  // Maximum length check
   if (query.length > 100) return false;
   
-  // Check for dangerous patterns
   const dangerousPatterns = [
     /<script/i,
     /javascript:/i,
@@ -278,4 +276,85 @@ export const validateSKU = (sku: string): { isValid: boolean; error?: string } =
   }
   return { isValid: true };
 };
+
+export const validateCardNumber = (cardNumber: string): {isValid: boolean; error?: string} => {
+  const sanitized = sanitizeString(cardNumber).replace(/\s/g, "");
+
+  if (sanitized.length === 0) {
+    return { isValid: false, error: "Card number is required" };
+  }
+  
+  if (!/^\d+$/.test(sanitized)) {
+    return { isValid: false, error: "Card number must contain only digits" };
+  }
+  
+  if (sanitized.length < 13 || sanitized.length > 19) {
+    return { isValid: false, error: "Card number must be between 13 and 19 digits" };
+  }
+
+  let sum = 0;
+  let isEven = false;
+  
+  for (let i = sanitized.length - 1; i >= 0; i--) {
+    let digit = parseInt(sanitized.charAt(i), 10);
+    
+    if (isEven) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+    
+    sum += digit;
+    isEven = !isEven;
+  }
+  
+  if (sum % 10 !== 0) {
+    return { isValid: false, error: "Invalid card number" };
+  }
+  
+  return { isValid: true };
+}
+
+export const validateExpiryDate = (expiry: string): { isValid: boolean; error?: string } => {
+  const sanitized = sanitizeString(expiry).replace(/\s/g, "");
+  
+  if (sanitized.length === 0) {
+    return { isValid: false, error: "Expiry date is required" };
+  }
+  
+  const expiryRegex = /^(0[1-9]|1[0-2])\/(\d{2})$/;
+  if (!expiryRegex.test(sanitized)) {
+    return { isValid: false, error: "Expiry date must be in MM/YY format" };
+  }
+  
+  const [month, year] = sanitized.split("/");
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear() % 100;
+  const currentMonth = currentDate.getMonth() + 1;
+  
+  const expYear = parseInt(year, 10);
+  const expMonth = parseInt(month, 10);
+  
+  if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+    return { isValid: false, error: "Card has expired" };
+  }
+  
+  return { isValid: true };
+};
+
+export const validateCVV = (cvv: string): { isValid: boolean; error?: string } => {
+  const sanitized = sanitizeString(cvv).replace(/\s/g, "");
+  
+  if (sanitized.length === 0) {
+    return { isValid: false, error: "CVV is required" };
+  }
+  
+  if (!/^\d{3,4}$/.test(sanitized)) {
+    return { isValid: false, error: "CVV must be 3 or 4 digits" };
+  }
+  
+  return { isValid: true };
+};
+
 
