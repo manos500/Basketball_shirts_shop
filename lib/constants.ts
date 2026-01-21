@@ -13,6 +13,28 @@ export const PAYMENT_METHODS = [
   },
 ];
 
+export const footerColumns = [
+  {
+    title: "Customer service",
+    links: ["FAQ's", "Order & payments", "Delivery", "Returns & exchanges"],
+  },
+  {
+    title: "Information",
+    links: ["📞 +1 234 567 890", "✉️ courtstyle@gmail.com", "📍 Athens, Greece"],
+  },
+  {
+    title: "About us",
+    links: ["Privacy Policy", "Terms & Conditions", "Cookies Policy"],
+    href: ["/privacy-policy", "accessibility "]
+  },
+] 
+
+export const socialLinks = [
+  { name: "Facebook", href: "#", icon: "/facebook.png" },
+  { name: "Instagram", href: "#", icon: "/instagram.png" },
+  { name: "Twitter", href: "#", icon: "/x.png" },
+]
+
 export const OPTIONS = [
   { label: "Featured", value: "featured" },
   { label: "Newest", value: "newest" },
